@@ -1,9 +1,16 @@
+/// <reference types="vite/client" />
+
 import axios from 'axios'
 
-// L'URL de base est proxifiée par Vite en dev (voir vite.config.ts)
-// En production, remplacer par l'URL réelle du backend
+// En dev : utilise le proxy Vite (vite.config.ts)
+// En prod : utilise l'URL HTTPS du backend depuis .env
+const apiUrl = (() => {
+  const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined
+  return import.meta.env.PROD && apiBase ? `${apiBase}/api` : '/api'
+})()
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
   },

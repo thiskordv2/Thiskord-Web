@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import * as signalR from '@microsoft/signalr'
 
 let connection: signalR.HubConnection | null = null
@@ -9,14 +11,21 @@ let connection: signalR.HubConnection | null = null
 export function getHubConnection(): signalR.HubConnection {
   if (connection) return connection
 
+  // En dev : utilise le proxy Vite (/chatHub sera proxifié)
+  // En prod : construit l'URL wss:// complète
+  const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined
+  const hubUrl = import.meta.env.PROD && apiBase
+    ? `${apiBase}/chatHub`.replace(/^http/, 'ws')
+    : '/chatHub'
+
   connection = new signalR.HubConnectionBuilder()
-    .withUrl('/chatHub', {
+    .withUrl(hubUrl, {
       accessTokenFactory: () => localStorage.getItem('thiskord_token') ?? '',
-      })
+    })
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Warning)
     .build()
-      return connection
+  return connection
 }
 
 /**
