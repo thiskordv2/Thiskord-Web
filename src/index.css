@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* Configuration du thème et des variables */
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Styles de base (équivalent à @layer base) */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-gray-950 text-gray-100 font-sans;
+  }
+
+  /* Scrollbar custom */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+}
+
+/* Composants (équivalent à @layer components) */
+@layer components {
+  /* Bouton primaire */
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Bouton secondaire */
+  .btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-gray-100 font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  /* Bouton ghost (sidebar) */
+  .btn-ghost {
+    @apply hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-2 rounded-lg transition-colors w-full text-left;
+  }
+
+  /* Input standard */
+  .input {
+    @apply bg-gray-800 border border-gray-600 text-gray-100 placeholder-gray-500 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-indigo-500 transition-colors;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-gray-800 border border-gray-700 rounded-xl p-4;
+  }
+
+  .badge {
+      @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    }
+
+    .badge-todo {
+      @apply text-xs font-medium px-2 py-0.5 rounded-full bg-gray-700 text-gray-300;
+    }
+
+    .badge-inprogress {
+      @apply text-xs font-medium px-2 py-0.5 rounded-full bg-blue-900 text-blue-300;
+    }
+
+    .badge-done {
+      @apply text-xs font-medium px-2 py-0.5 rounded-full bg-green-900 text-green-300;
+    }
+}
