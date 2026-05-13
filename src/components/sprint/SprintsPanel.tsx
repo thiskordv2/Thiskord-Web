@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSprints, useCreateSprint, useDeleteSprint } from '@/hooks/useSprints'
+import { Plus, Trash2, CalendarDays, Target } from 'lucide-react'
 import type { Project, Sprint } from '@/types'
 
 /**
@@ -31,27 +32,56 @@ export function SprintsPanel({ project }: { project: Project }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-gray-200">Sprints</h3>
+        <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+          Sprints
+        </h3>
         <button
-          className="text-indigo-400 text-sm hover:text-indigo-300"
+          className="flex items-center gap-1.5 text-sm transition-colors duration-200"
+          style={{
+            color: showForm ? 'var(--color-text-muted)' : 'var(--color-accent-violet-light)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8' }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? 'Annuler' : '+ Nouveau'}
+          {showForm ? (
+            'Annuler'
+          ) : (
+            <>
+              <Plus className="w-3.5 h-3.5" />
+              Nouveau
+            </>
+          )}
         </button>
       </div>
 
       {/* Formulaire de création */}
       {showForm && (
-        <div className="card space-y-2 max-w-full overflow-hidden">
-          <input
-            className="input text-sm w-full min-w-0"
-            placeholder="Objectif du sprint"
-            value={form.sprint_goal}
-            onChange={(e) => setForm({ ...form, sprint_goal: e.target.value })}
-          />
+        <div
+          className="card space-y-3 max-w-full overflow-hidden"
+          style={{ animation: 'slideUp 0.25s ease' }}
+        >
+          <div>
+            <label className="flex items-center gap-1.5 text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
+              <Target className="w-3 h-3" />
+              Objectif
+            </label>
+            <input
+              className="input text-sm w-full min-w-0"
+              placeholder="Objectif du sprint"
+              value={form.sprint_goal}
+              onChange={(e) => setForm({ ...form, sprint_goal: e.target.value })}
+            />
+          </div>
           <div className="grid grid-cols-1 gap-2">
             <div className="min-w-0">
-              <label className="block text-xs text-gray-500">Début</label>
+              <label className="flex items-center gap-1.5 text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                <CalendarDays className="w-3 h-3" />
+                Début
+              </label>
               <input
                 className="input text-sm w-full min-w-0"
                 type="date"
@@ -60,7 +90,10 @@ export function SprintsPanel({ project }: { project: Project }) {
               />
             </div>
             <div className="min-w-0">
-              <label className="block text-xs text-gray-500">Fin</label>
+              <label className="flex items-center gap-1.5 text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                <CalendarDays className="w-3 h-3" />
+                Fin
+              </label>
               <input
                 className="input text-sm w-full min-w-0"
                 type="date"
@@ -81,7 +114,16 @@ export function SprintsPanel({ project }: { project: Project }) {
 
       {/* Liste */}
       {isLoading && (
-        <p className="text-gray-600 text-sm">Chargement...</p>
+        <div className="flex items-center justify-center py-6">
+          <div
+            className="w-5 h-5 rounded-full border-2"
+            style={{
+              borderColor: 'var(--color-surface-3)',
+              borderTopColor: 'var(--color-accent-violet)',
+              animation: 'spin 0.7s linear infinite',
+            }}
+          />
+        </div>
       )}
 
       {sprints.map((sprint: Sprint) => (
@@ -98,7 +140,9 @@ export function SprintsPanel({ project }: { project: Project }) {
       ))}
 
       {!isLoading && sprints.length === 0 && (
-        <p className="text-gray-600 text-sm">Aucun sprint créé</p>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Aucun sprint créé
+        </p>
       )}
     </div>
   )
@@ -112,19 +156,32 @@ function SprintCard({
   onDelete: () => void
 }) {
   return (
-    <div className="card space-y-1">
+    <div
+      className="card space-y-1.5"
+      style={{
+        borderLeft: '3px solid var(--color-accent-violet)',
+      }}
+    >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-gray-200 text-sm font-medium">{sprint.sprint_goal}</p>
+        <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+          {sprint.sprint_goal}
+        </p>
         <button
-          className="text-gray-600 hover:text-red-400 text-xs flex-shrink-0"
+          className="btn-icon !w-6 !h-6 flex-shrink-0"
           onClick={onDelete}
+          title="Supprimer"
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-status-error)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = '' }}
         >
-          ✕
+          <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
-      <p className="text-gray-500 text-xs">
-        {sprint.sprint_begin_date} → {sprint.sprint_end_date}
-      </p>
+      <div className="flex items-center gap-1.5">
+        <CalendarDays className="w-3 h-3" style={{ color: 'var(--color-text-muted)' }} />
+        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          {sprint.sprint_begin_date} → {sprint.sprint_end_date}
+        </p>
+      </div>
     </div>
   )
 }

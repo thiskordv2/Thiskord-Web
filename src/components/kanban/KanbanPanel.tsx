@@ -16,23 +16,28 @@ import { useSprints } from '@/hooks/useSprints'
 import { useTasks, useUpdateTask } from '@/hooks/useTasks'
 import { KanbanCard } from './KanbanCard'
 import { CreateTaskModal } from './CreateTaskModal'
+import { Plus, Circle, Clock, CheckCircle2 } from 'lucide-react'
 import type { Project, SprintTask, TaskStatus } from '@/types'
 
-const COLUMNS: { id: TaskStatus; label: string }[] = [
-  { id: 'todo', label: 'À faire' },
-  { id: 'in-progress', label: 'En cours' },
-  { id: 'done', label: 'Terminé' },
+const COLUMNS: { id: TaskStatus; label: string; icon: typeof Circle; color: string }[] = [
+  { id: 'todo', label: 'À faire', icon: Circle, color: 'var(--color-text-secondary)' },
+  { id: 'in-progress', label: 'En cours', icon: Clock, color: 'var(--color-status-warning)' },
+  { id: 'done', label: 'Terminé', icon: CheckCircle2, color: 'var(--color-status-success)' },
 ]
 
 function KanbanColumn({
   status,
   label,
   tasks,
+  icon: Icon,
+  color,
   onAddTask,
 }: {
   status: TaskStatus
   label: string
   tasks: SprintTask[]
+  icon: typeof Circle
+  color: string
   onAddTask: (status: TaskStatus) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `col-${status}` })
@@ -40,25 +45,41 @@ function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`rounded-xl border border-gray-800/80 bg-gray-950/40 p-3 transition-colors ${
-        isOver ? 'border-indigo-500/60 bg-indigo-950/20' : ''
-      }`}
+      className="rounded-xl p-3 transition-all duration-200"
+      style={{
+        background: isOver ? 'rgba(139, 92, 246, 0.06)' : 'rgba(16, 16, 28, 0.4)',
+        border: isOver
+          ? '1px solid rgba(139, 92, 246, 0.3)'
+          : '1px solid var(--color-border-subtle)',
+      }}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-          {label}
-        </span>
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600">{tasks.length}</span>
-          <button
-            className="text-gray-600 hover:text-gray-300 text-sm"
-            onClick={() => onAddTask(status)}
-            title="Ajouter une tâche"
-            type="button"
+          <Icon className="w-3.5 h-3.5" style={{ color }} />
+          <span
+            className="text-xs font-semibold uppercase tracking-wider"
+            style={{ color: 'var(--color-text-secondary)' }}
           >
-            +
-          </button>
+            {label}
+          </span>
+          <span
+            className="text-[0.65rem] font-medium px-1.5 py-0.5 rounded-full"
+            style={{
+              background: 'var(--color-surface-3)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            {tasks.length}
+          </span>
         </div>
+        <button
+          className="btn-icon !w-6 !h-6"
+          onClick={() => onAddTask(status)}
+          title="Ajouter une tâche"
+          type="button"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       <SortableContext
@@ -137,7 +158,12 @@ export function KanbanPanel({ project }: { project: Project }) {
     <div className="space-y-4">
       {/* Sélecteur de sprint */}
       <div>
-        <label className="text-xs text-gray-500 block mb-1">Sprint</label>
+        <label
+          className="text-xs block mb-1.5"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          Sprint
+        </label>
         <select
           className="input text-sm"
           value={selectedSprintId ?? ''}
@@ -155,7 +181,7 @@ export function KanbanPanel({ project }: { project: Project }) {
       </div>
 
       {!selectedSprintId && (
-        <p className="text-gray-600 text-sm">
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
           Sélectionnez un sprint pour afficher le kanban
         </p>
       )}
@@ -166,7 +192,7 @@ export function KanbanPanel({ project }: { project: Project }) {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <div className="space-y-4">
+          <div className="space-y-3">
             {COLUMNS.map((col) => {
               const colTasks = tasksByStatus(col.id)
               return (
@@ -174,6 +200,8 @@ export function KanbanPanel({ project }: { project: Project }) {
                   key={col.id}
                   status={col.id}
                   label={col.label}
+                  icon={col.icon}
+                  color={col.color}
                   tasks={colTasks}
                   onAddTask={(status) => {
                     setCreateInStatus(status)

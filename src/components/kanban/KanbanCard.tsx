@@ -6,10 +6,25 @@ interface Props {
   task: SprintTask
 }
 
-const STATUS_LABELS: Record<SprintTask['task_status'], string> = {
-  todo: 'À faire',
-  'in-progress': 'En cours',
-  done: 'Terminé',
+const STATUS_CONFIG: Record<SprintTask['task_status'], { label: string; color: string; bg: string; border: string }> = {
+  todo: {
+    label: 'À faire',
+    color: 'var(--color-text-secondary)',
+    bg: 'rgba(136, 136, 164, 0.1)',
+    border: 'rgba(136, 136, 164, 0.2)',
+  },
+  'in-progress': {
+    label: 'En cours',
+    color: 'var(--color-status-warning)',
+    bg: 'rgba(251, 191, 36, 0.08)',
+    border: 'rgba(251, 191, 36, 0.2)',
+  },
+  done: {
+    label: 'Terminé',
+    color: 'var(--color-status-success)',
+    bg: 'rgba(52, 211, 153, 0.08)',
+    border: 'rgba(52, 211, 153, 0.2)',
+  },
 }
 
 export function KanbanCard({ task }: Props) {
@@ -31,27 +46,54 @@ export function KanbanCard({ task }: Props) {
     updateTask.mutate(payload)
   }
 
+  const cfg = STATUS_CONFIG[task.task_status]
+
   return (
     <article
       ref={setNodeRef}
-      style={style}
-      className={`rounded-lg border border-gray-800 bg-gray-900/90 p-3 shadow-sm shadow-black/20 ${
-        isDragging ? 'opacity-60 ring-2 ring-indigo-500/60' : 'hover:border-gray-700'
-      }`}
+      style={{
+        ...style,
+        background: isDragging ? 'var(--color-surface-3)' : 'var(--color-surface-2)',
+        border: `1px solid ${isDragging ? 'var(--color-accent-violet)' : 'var(--color-border-subtle)'}`,
+        borderLeft: `3px solid ${cfg.color}`,
+        opacity: isDragging ? 0.8 : 1,
+        boxShadow: isDragging
+          ? '0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(139,92,246,0.1)'
+          : '0 1px 3px rgba(0,0,0,0.1)',
+      }}
+      className="rounded-lg p-3 transition-all duration-200 hover:border-[var(--color-border-medium)]"
       {...attributes}
       {...listeners}
     >
       <div className="flex items-start justify-between gap-3">
-        <h4 className="text-sm font-medium text-gray-100 leading-snug">
+        <h4
+          className="text-sm font-medium leading-snug"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {task.task_title}
         </h4>
-        <span className="shrink-0 rounded-full bg-gray-800 px-2 py-0.5 text-[11px] font-medium text-gray-300">
-          {STATUS_LABELS[task.task_status]}
+        <span
+          className="shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-medium"
+          style={{
+            background: cfg.bg,
+            color: cfg.color,
+            border: `1px solid ${cfg.border}`,
+          }}
+        >
+          {cfg.label}
         </span>
       </div>
+
       {/* Status selector */}
       <select
-        className="ml-2 rounded bg-gray-800 px-1 py-0.5 text-xs text-gray-200"
+        className="mt-2 rounded-lg px-1.5 py-0.5 text-xs"
+        style={{
+          background: 'var(--color-surface-1)',
+          color: 'var(--color-text-secondary)',
+          border: '1px solid var(--color-border-subtle)',
+          fontFamily: 'inherit',
+          outline: 'none',
+        }}
         value={task.task_status}
         onChange={handleStatusChange}
         disabled={updateTask.isPending}
@@ -62,7 +104,10 @@ export function KanbanCard({ task }: Props) {
       </select>
 
       {task.task_desc && (
-        <p className="mt-2 text-sm text-gray-400 leading-relaxed line-clamp-3">
+        <p
+          className="mt-2 text-sm leading-relaxed line-clamp-3"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
           {task.task_desc}
         </p>
       )}

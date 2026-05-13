@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { accountApi } from '@/api/account'
+import { ArrowLeft, User, Lock, LogOut, CheckCircle2, AlertCircle } from 'lucide-react'
 
 /**
  * Page /profile
@@ -63,21 +64,86 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-8">
-      <div className="max-w-lg mx-auto space-y-6">
+    <div
+      className="min-h-screen p-8"
+      style={{ background: 'var(--color-bg-deep)' }}
+    >
+      <div
+        className="max-w-lg mx-auto space-y-6"
+        style={{ animation: 'fadeIn 0.4s ease' }}
+      >
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-white">Mon profil</h1>
-          <button className="btn-ghost text-sm" onClick={() => navigate('/app')}>
-            ← Retour
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-accent-violet), var(--color-accent-cyan))',
+                color: 'white',
+                boxShadow: '0 4px 20px rgba(139, 92, 246, 0.25)',
+              }}
+            >
+              {user.user_name?.[0]?.toUpperCase()}
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                {user.user_name}
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                {user.user_mail}
+              </p>
+            </div>
+          </div>
+          <button
+            className="btn-secondary flex items-center gap-1.5 text-sm"
+            onClick={() => navigate('/app')}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour
           </button>
         </div>
 
+        {/* Feedback messages */}
+        {success && (
+          <div
+            className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
+            style={{
+              color: 'var(--color-status-success)',
+              background: 'rgba(52, 211, 153, 0.08)',
+              border: '1px solid rgba(52, 211, 153, 0.15)',
+              animation: 'slideUp 0.25s ease',
+            }}
+          >
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            {success}
+          </div>
+        )}
+        {error && (
+          <div
+            className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
+            style={{
+              color: 'var(--color-status-error)',
+              background: 'rgba(248, 113, 113, 0.08)',
+              border: '1px solid rgba(248, 113, 113, 0.15)',
+              animation: 'slideUp 0.25s ease',
+            }}
+          >
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
+
         {/* Formulaire profil */}
         <form onSubmit={handleUpdateProfile} className="card space-y-4">
-          <h2 className="font-medium text-gray-200">Informations</h2>
+          <div className="flex items-center gap-2 mb-1">
+            <User className="w-4 h-4" style={{ color: 'var(--color-accent-violet-light)' }} />
+            <h2 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+              Informations
+            </h2>
+          </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
               Nom d'utilisateur
             </label>
             <input
@@ -88,7 +154,9 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
+              Email
+            </label>
             <input
               className="input"
               type="email"
@@ -98,7 +166,7 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
               URL avatar (optionnel)
             </label>
             <input
@@ -110,7 +178,7 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
               Mot de passe actuel (requis pour modifier)
             </label>
             <input
@@ -128,10 +196,15 @@ export default function ProfilePage() {
 
         {/* Formulaire mot de passe */}
         <form onSubmit={handleUpdatePassword} className="card space-y-4">
-          <h2 className="font-medium text-gray-200">Changer le mot de passe</h2>
+          <div className="flex items-center gap-2 mb-1">
+            <Lock className="w-4 h-4" style={{ color: 'var(--color-accent-cyan)' }} />
+            <h2 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+              Changer le mot de passe
+            </h2>
+          </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
               Nouveau mot de passe
             </label>
             <input
@@ -147,19 +220,36 @@ export default function ProfilePage() {
           </button>
         </form>
 
-        {success && <p className="text-green-400 text-sm">{success}</p>}
-        {error && <p className="text-red-400 text-sm">{error}</p>}
-
         {/* Déconnexion */}
         <div className="card">
-          <h2 className="font-medium text-gray-200 mb-3">Session</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <LogOut className="w-4 h-4" style={{ color: 'var(--color-status-error)' }} />
+            <h2 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+              Session
+            </h2>
+          </div>
           <button
-            className="btn-secondary text-red-400 hover:text-red-300"
+            className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200"
+            style={{
+              background: 'rgba(248, 113, 113, 0.08)',
+              color: 'var(--color-status-error)',
+              border: '1px solid rgba(248, 113, 113, 0.15)',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(248, 113, 113, 0.15)'
+              e.currentTarget.style.borderColor = 'rgba(248, 113, 113, 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(248, 113, 113, 0.08)'
+              e.currentTarget.style.borderColor = 'rgba(248, 113, 113, 0.15)'
+            }}
             onClick={async () => {
               await logout()
               navigate('/login')
             }}
           >
+            <LogOut className="w-4 h-4" />
             Se déconnecter
           </button>
         </div>

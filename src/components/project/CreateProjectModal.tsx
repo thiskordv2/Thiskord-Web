@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useCreateProject } from '@/hooks/useProjects'
+import { FolderPlus } from 'lucide-react'
 
 interface Props {
   onClose: () => void
@@ -17,13 +18,28 @@ export function CreateProjectModal({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="card w-full max-w-sm">
-        <h2 className="font-semibold text-gray-100 mb-4">Nouveau projet</h2>
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(34,211,238,0.1))',
+              border: '1px solid var(--color-border-subtle)',
+            }}
+          >
+            <FolderPlus className="w-4.5 h-4.5" style={{ color: 'var(--color-accent-violet-light)' }} />
+          </div>
+          <h2 className="font-semibold text-lg" style={{ color: 'var(--color-text-primary)' }}>
+            Nouveau projet
+          </h2>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Nom</label>
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
+              Nom
+            </label>
             <input
               className="input"
               value={name}
@@ -33,7 +49,7 @@ export function CreateProjectModal({ onClose }: Props) {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
               Description
             </label>
             <textarea
@@ -44,7 +60,7 @@ export function CreateProjectModal({ onClose }: Props) {
             />
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-1">
             <button type="button" className="btn-secondary flex-1" onClick={onClose}>
               Annuler
             </button>

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useCreateTask } from '@/hooks/useTasks'
 import { useAuthStore } from '@/store/authStore'
+import { ListTodo, AlignLeft } from 'lucide-react'
 import type { Project, TaskStatus } from '@/types'
 
 interface Props {
@@ -42,14 +43,24 @@ export function CreateTaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="card w-full max-w-md">
-        <h2 className="mb-1 font-semibold text-gray-100">Nouvelle tâche</h2>
-        <p className="mb-4 text-sm text-gray-500">Dans {project.name}</p>
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card">
+        <h2
+          className="mb-1 font-semibold text-lg"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          Nouvelle tâche
+        </h2>
+        <p className="mb-5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Dans {project.name}
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm text-gray-400">Titre</label>
+            <label className="mb-1.5 flex items-center gap-1.5 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              <ListTodo className="w-3.5 h-3.5" />
+              Titre
+            </label>
             <input
               className="input"
               value={title}
@@ -61,22 +72,30 @@ export function CreateTaskModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-gray-400">
+            <label className="mb-1.5 flex items-center gap-1.5 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              <AlignLeft className="w-3.5 h-3.5" />
               Description
             </label>
             <textarea
               className="input min-h-[96px] resize-none"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Détails, critères d’acceptation, contexte..."
+              placeholder="Détails, critères d'acceptation, contexte..."
             />
           </div>
 
-          <div className="rounded-lg border border-gray-800 bg-gray-950/50 px-3 py-2 text-sm text-gray-400">
-            Statut initial: <span className="text-gray-200">{defaultStatus}</span>
+          <div
+            className="rounded-lg px-3 py-2.5 text-sm"
+            style={{
+              background: 'var(--color-surface-1)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            Statut initial : <span style={{ color: 'var(--color-text-primary)' }}>{defaultStatus}</span>
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-1">
             <button type="button" className="btn-secondary flex-1" onClick={onClose}>
               Annuler
             </button>
