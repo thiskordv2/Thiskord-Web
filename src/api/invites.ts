@@ -14,9 +14,12 @@ type RawInviteResponse = {
 
 const mapInviteResponse = (invite: RawInviteResponse): InviteResponse => {
   const token = invite.token ?? invite.inviteToken ?? ''
+  // Si le serveur retourne déjà une URL complète (commence par http), l'utiliser directement
+  // Sinon, construire le lien relatif /invite/{token}
   const link =
-    invite.link ||
-    (token ? `/invite/${token}` : '')
+    invite.link && invite.link.startsWith('http')
+      ? invite.link
+      : invite.link || (token ? `${token}` : '')
   return { token, link }
 }
 

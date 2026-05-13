@@ -17,13 +17,15 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://api.emre-ak.fr:8080',
+        target: 'https://api.emre-ak.fr',
         changeOrigin: true,
+        secure: true,
       },
       '/chatHub': {
-        target: 'https://api.emre-ak.fr:8080',
+        target: 'https://api.emre-ak.fr',
         changeOrigin: true,
         ws: true,
+        secure: true,
       },
     },
   },

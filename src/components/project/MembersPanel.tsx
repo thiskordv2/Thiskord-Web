@@ -16,7 +16,6 @@ export function MembersPanel({ project }: { project: Project }) {
     setGeneratingInvite(true)
     try {
       const res = await invitesApi.create({ projectId: project.project_id })
-      // Le serveur retourne déjà l'URL complète du lien d'invitation
       setInviteLink(res.link)
     } catch {
       setInviteLink('')
