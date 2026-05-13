@@ -11,11 +11,11 @@ let connection: signalR.HubConnection | null = null
 export function getHubConnection(): signalR.HubConnection {
   if (connection) return connection
 
-  // En dev : utilise le proxy Vite (/chatHub sera proxifié)
-  // En prod : construit l'URL wss:// complète
+  // En dev : utilise le proxy Vite (/chatHub sera proxifie)
+  // En prod : utiliser une URL HTTPS; SignalR gerera ensuite l'upgrade WebSocket
   const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined
   const hubUrl = import.meta.env.PROD && apiBase
-    ? `${apiBase}/chatHub`.replace(/^http/, 'ws')
+    ? `${apiBase}/chatHub`
     : '/chatHub'
 
   connection = new signalR.HubConnectionBuilder()
