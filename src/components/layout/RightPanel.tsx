@@ -13,20 +13,26 @@ const TABS = [
 
 type Panel = (typeof TABS)[number]['id']
 
-export function RightPanel({ project }: { project: Project }) {
+interface RightPanelProps {
+  project: Project
+  /** En mode mobile fullscreen : occupe toute la largeur */
+  mobileFullscreen?: boolean
+}
+
+export function RightPanel({ project, mobileFullscreen = false }: RightPanelProps) {
   const { rightPanel, setRightPanel } = useAppStore()
 
   return (
     <aside
-      className="w-80 flex-shrink-0 flex flex-col h-full"
+      className={mobileFullscreen ? 'flex flex-col h-full w-full' : 'w-80 flex-shrink-0 flex flex-col h-full'}
       style={{
-        background: 'var(--color-surface-1)',
-        borderLeft: '1px solid var(--color-border-subtle)',
+        background: mobileFullscreen ? 'transparent' : 'var(--color-surface-1)',
+        borderLeft: mobileFullscreen ? 'none' : '1px solid var(--color-border-subtle)',
       }}
     >
       {/* Tabs */}
       <div
-        className="flex"
+        className="flex flex-shrink-0"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         {TABS.map((tab) => {

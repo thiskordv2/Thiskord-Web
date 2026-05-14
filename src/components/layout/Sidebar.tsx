@@ -7,19 +7,27 @@ import { useChannels } from '@/hooks/useChannels'
 import { CreateProjectModal } from '../project/CreateProjectModal'
 import { CreateChannelModal } from '../project/CreateChannelModal'
 import { JoinProjectModal } from '../project/JoinProjectModal'
-import { Plus, Link2, Hash, User, FolderOpen } from 'lucide-react'
+import { Plus, Link2, Hash, User, FolderOpen, X } from 'lucide-react'
 import type { Project } from '@/types'
+
+interface SidebarProps {
+  /** En mode overlay mobile : affiche un bouton de fermeture */
+  isMobileOverlay?: boolean
+}
 
 /**
  * Sidebar gauche :
  * - En-tête avec avatar utilisateur + lien profil
  * - Liste des projets
  * - Liste des canaux du projet actif
+ *
+ * Sur mobile (isMobileOverlay=true) : affichée en overlay plein-hauteur
+ * avec un bouton de fermeture.
  */
-export function Sidebar() {
+export function Sidebar({ isMobileOverlay = false }: SidebarProps) {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
-  const { activeProject, activeChannel, setActiveProject, setActiveChannel } =
+  const { activeProject, activeChannel, setActiveProject, setActiveChannel, setMobileSidebarOpen } =
     useAppStore()
 
   const { data: projects = [], isLoading: loadingProjects } = useProjects()
@@ -34,6 +42,12 @@ export function Sidebar() {
     setActiveChannel(null)
   }
 
+  const handleSelectChannel = (channel: typeof channels[0]) => {
+    setActiveChannel(channel)
+    // Ferme la sidebar sur mobile après sélection d'un canal
+    if (isMobileOverlay) setMobileSidebarOpen(false)
+  }
+
   return (
     <>
       <aside
@@ -41,16 +55,21 @@ export function Sidebar() {
         style={{
           background: 'var(--color-surface-1)',
           borderRight: '1px solid var(--color-border-subtle)',
+          // En overlay mobile : prend toute la hauteur
+          ...(isMobileOverlay && { width: '100%', maxWidth: '280px' }),
         }}
       >
         {/* En-tête utilisateur */}
         <div
-          className="p-4"
+          className="p-4 flex items-center gap-2"
           style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
         >
           <button
-            className="flex items-center gap-3 w-full rounded-xl p-2 transition-all duration-200"
-            onClick={() => navigate('/profile')}
+            className="flex items-center gap-3 flex-1 rounded-xl p-2 transition-all duration-200"
+            onClick={() => {
+              navigate('/profile')
+              if (isMobileOverlay) setMobileSidebarOpen(false)
+            }}
             style={{ background: 'transparent' }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-hover)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
@@ -76,6 +95,17 @@ export function Sidebar() {
             </div>
             <User className="w-4 h-4 ml-auto flex-shrink-0" style={{ color: 'var(--color-text-muted)' }} />
           </button>
+
+          {/* Bouton fermeture mobile */}
+          {isMobileOverlay && (
+            <button
+              className="btn-icon flex-shrink-0"
+              onClick={() => setMobileSidebarOpen(false)}
+              aria-label="Fermer la sidebar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Liste des projets */}
@@ -189,7 +219,7 @@ export function Sidebar() {
                       onMouseLeave={(e) => {
                         if (!isActive) e.currentTarget.style.background = 'transparent'
                       }}
-                      onClick={() => setActiveChannel(channel)}
+                      onClick={() => handleSelectChannel(channel)}
                     >
                       <Hash className="w-3.5 h-3.5 flex-shrink-0" style={{
                         color: isActive ? 'var(--color-accent-cyan)' : 'var(--color-text-muted)'

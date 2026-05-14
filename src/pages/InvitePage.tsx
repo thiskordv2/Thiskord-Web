@@ -16,7 +16,7 @@ export default function InvitePage() {
   }, [token, navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg-deep)' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-bg-deep)' }}>
       <div className="card text-center max-w-sm w-full" style={{ boxShadow: '0 16px 64px rgba(0,0,0,0.3)', animation: 'slideUp 0.4s ease' }}>
         {status === 'loading' && (
           <div className="py-4">

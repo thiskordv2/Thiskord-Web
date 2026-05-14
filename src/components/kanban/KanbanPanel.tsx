@@ -3,6 +3,7 @@ import {
   DndContext,
   closestCenter,
   MouseSensor,
+  TouchSensor,
   useDroppable,
   useSensor,
   useSensors,
@@ -114,6 +115,13 @@ export function KanbanPanel({ project }: { project: Project }) {
     useSensor(MouseSensor, {
       activationConstraint: {
         distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        // Délai 200ms + tolérance 5px pour distinguer tap et drag
+        delay: 200,
+        tolerance: 5,
       },
     })
   )

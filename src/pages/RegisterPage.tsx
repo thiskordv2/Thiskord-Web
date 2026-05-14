@@ -68,7 +68,7 @@ export default function RegisterPage() {
       />
 
       <div
-        className="w-full max-w-sm relative z-10"
+        className="w-full max-w-sm px-4 relative z-10"
         style={{ animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
         <div className="text-center mb-8">

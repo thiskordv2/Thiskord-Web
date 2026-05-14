@@ -1,18 +1,50 @@
 import { useRef, useEffect, useState, type KeyboardEvent } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { MessageItem } from './MessageItem'
-import type { Channel } from '@/types'
+import type { Channel, ChatMessage } from '@/types'
 import { useAuthStore } from '@/store/authStore'
-import { Hash, SendHorizonal, MessageSquare } from 'lucide-react'
+import { useAppStore } from '@/store/appStore'
+import { useIsMobile } from '@/hooks/useIsMobile'
+import { Hash, SendHorizonal, MessageSquare, Menu } from 'lucide-react'
+
+// --- Helpers pour le regroupement de messages ---
+function parseMessageDate(dateStr: string): Date {
+  if (!dateStr) return new Date(0)
+  const [datePart, timePart] = dateStr.split(' ')
+  if (!datePart || !timePart) return new Date(0)
+  
+  const [day, month] = datePart.split('/')
+  const [hours, minutes] = timePart.split(':')
+  
+  // Utilise l'année en cours par défaut
+  const year = new Date().getFullYear()
+  return new Date(year, parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes))
+}
+
+function isGroupedMessage(currentMsg: ChatMessage, prevMsg?: ChatMessage): boolean {
+  if (!prevMsg) return false
+  if (currentMsg.user !== prevMsg.user) return false
+  
+  const d1 = parseMessageDate(prevMsg.dateTime)
+  const d2 = parseMessageDate(currentMsg.dateTime)
+  const diffMinutes = Math.abs(d2.getTime() - d1.getTime()) / (1000 * 60)
+  
+  // Seuil de 5 minutes pour un délai "normal"
+  return diffMinutes <= 5
+}
 
 /**
  * Panneau de chat pour un canal donné.
  * - Se connecte au hub SignalR via useChat
  * - Affiche l'historique et les nouveaux messages
  * - Input d'envoi avec Entrée
+ * - Sur mobile : bouton hamburger pour ouvrir la sidebar
  */
 export function ChatPanel({ channel }: { channel: Channel }) {
   const user = useAuthStore((s) => s.user)
+  const toggleMobileSidebar = useAppStore((s) => s.toggleMobileSidebar)
+  const isMobile = useIsMobile()
+
   const { messages, isConnected, isLoading, sendMessage, deleteMessage, editMessage } = useChat(
     channel.channel_id,
   )
@@ -42,20 +74,35 @@ export function ChatPanel({ channel }: { channel: Channel }) {
     <div className="flex flex-col h-full">
       {/* En-tête du canal */}
       <header
-        className="px-5 py-3 flex items-center gap-2.5"
+        className="px-4 py-3 flex items-center gap-2.5"
         style={{
           borderBottom: '1px solid var(--color-border-subtle)',
           background: 'rgba(16, 16, 28, 0.5)',
           backdropFilter: 'blur(12px)',
+          flexShrink: 0,
         }}
       >
-        <Hash className="w-4.5 h-4.5" style={{ color: 'var(--color-accent-violet-light)' }} />
-        <h2 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+        {/* Bouton hamburger — mobile uniquement */}
+        {isMobile && (
+          <button
+            className="btn-icon mobile-only flex-shrink-0"
+            onClick={toggleMobileSidebar}
+            aria-label="Ouvrir la navigation"
+            style={{ display: 'inline-flex' }}
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
+
+        <Hash className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-accent-violet-light)' }} />
+        <h2 className="font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>
           {channel.name}
         </h2>
-        {channel.description && (
+
+        {/* Description — masquée sur mobile pour gagner de la place */}
+        {channel.description && !isMobile && (
           <>
-            <span style={{ color: 'var(--color-border-medium)' }}>·</span>
+            <span style={{ color: 'var(--color-border-medium)', flexShrink: 0 }}>·</span>
             <span
               className="text-sm truncate"
               style={{ color: 'var(--color-text-muted)' }}
@@ -64,7 +111,8 @@ export function ChatPanel({ channel }: { channel: Channel }) {
             </span>
           </>
         )}
-        <div className="ml-auto flex items-center gap-2">
+
+        <div className="ml-auto flex items-center gap-2 flex-shrink-0">
           <div
             className={isConnected ? 'glow-dot' : ''}
             style={{
@@ -81,7 +129,7 @@ export function ChatPanel({ channel }: { channel: Channel }) {
       </header>
 
       {/* Zone de messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {isLoading && (
           <div className="flex items-center justify-center py-12">
             <div
@@ -119,7 +167,7 @@ export function ChatPanel({ channel }: { channel: Channel }) {
           <MessageItem
             key={msg.id}
             message={msg}
-            isGrouped={i > 0 && messages[i - 1].user === msg.user}
+            isGrouped={isGroupedMessage(msg, i > 0 ? messages[i - 1] : undefined)}
             onDelete={deleteMessage}
             onEdit={editMessage}
             currentUser={user?.user_name ?? ''}
@@ -130,7 +178,7 @@ export function ChatPanel({ channel }: { channel: Channel }) {
       </div>
 
       {/* Zone de saisie */}
-      <div className="px-4 pb-4">
+      <div className="px-3 pb-3 flex-shrink-0">
         <div
           className="rounded-xl flex items-end gap-2 px-3 py-2 transition-all duration-200"
           style={{
@@ -151,6 +199,7 @@ export function ChatPanel({ channel }: { channel: Channel }) {
             style={{
               color: 'var(--color-text-primary)',
               fontFamily: 'inherit',
+              fontSize: '16px', // Bloque le zoom auto iOS
             }}
             placeholder={`Écrire dans #${channel.name}…`}
             value={input}

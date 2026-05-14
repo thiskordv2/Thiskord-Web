@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Pencil, Trash2, Check, X } from 'lucide-react'
+import { Pencil, Trash2, Check, X, MoreHorizontal } from 'lucide-react'
 import type { ChatMessage } from '@/types'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface Props {
   message: ChatMessage
@@ -14,13 +15,16 @@ export function MessageItem({ message, isGrouped, onDelete, onEdit, currentUser 
   const initials = message.user?.[0]?.toUpperCase() ?? '?'
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(message.text)
+  const [showMobileActions, setShowMobileActions] = useState(false)
   const isOwner = message.user === currentUser
+  const isMobile = useIsMobile()
 
   const handleEditSubmit = () => {
     if (editContent.trim() && editContent !== message.text) {
       onEdit(message.id, editContent.trim())
     }
     setIsEditing(false)
+    setShowMobileActions(false)
   }
 
   const content = isEditing ? (
@@ -59,7 +63,8 @@ export function MessageItem({ message, isGrouped, onDelete, onEdit, currentUser 
     </p>
   )
 
-  const actions = isOwner && !isEditing && (
+  // Actions desktop (hover) ou mobile (bouton ⋯ + menu)
+  const desktopActions = isOwner && !isEditing && (
     <div
       className="hidden group-hover:flex gap-0.5 flex-shrink-0"
       style={{ animation: 'fadeIn 0.15s ease' }}
@@ -82,6 +87,52 @@ export function MessageItem({ message, isGrouped, onDelete, onEdit, currentUser 
       </button>
     </div>
   )
+
+  // Sur mobile : bouton ⋯ qui ouvre un mini-menu inline
+  const mobileActionBtn = isOwner && !isEditing && isMobile && (
+    <div className="relative flex-shrink-0">
+      <button
+        className="btn-icon !w-7 !h-7"
+        onClick={() => setShowMobileActions(!showMobileActions)}
+        aria-label="Actions"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {showMobileActions && (
+        <div
+          className="absolute right-0 top-8 flex flex-col gap-1 rounded-xl p-1.5 z-10"
+          style={{
+            background: 'var(--color-surface-2)',
+            border: '1px solid var(--color-border-medium)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            animation: 'slideUp 0.15s ease',
+            minWidth: '120px',
+          }}
+        >
+          <button
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-hover)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            onClick={() => { setIsEditing(true); setShowMobileActions(false) }}
+          >
+            <Pencil className="w-3.5 h-3.5" /> Modifier
+          </button>
+          <button
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+            style={{ color: 'var(--color-status-error)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(248,113,113,0.08)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            onClick={() => { onDelete(message.id); setShowMobileActions(false) }}
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Supprimer
+          </button>
+        </div>
+      )}
+    </div>
+  )
+
+  const actions = isMobile ? mobileActionBtn : desktopActions
 
   if (isGrouped) {
     return (

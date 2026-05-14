@@ -65,7 +65,7 @@ export default function ProfilePage() {
 
   return (
     <div
-      className="min-h-screen p-8"
+      className="min-h-screen p-4 md:p-8"
       style={{ background: 'var(--color-bg-deep)' }}
     >
       <div
@@ -73,7 +73,7 @@ export default function ProfilePage() {
         style={{ animation: 'fadeIn 0.4s ease' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold"

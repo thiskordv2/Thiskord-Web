@@ -50,6 +50,7 @@
     height: 100%;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -74,10 +75,8 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-accent-violet);
   }
-}
 
-/* ─── ANIMATIONS ─── */
-@layer base {
+  /* ── Animations ── */
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -91,6 +90,11 @@
   @keyframes slideInLeft {
     from { opacity: 0; transform: translateX(-12px); }
     to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideInFromLeft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
   }
 
   @keyframes pulseGlow {
@@ -320,5 +324,133 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--color-border-medium), transparent);
     border: none;
+  }
+
+  /* ────────────────────────────────────────
+     RESPONSIVE MOBILE — Utilitaires
+     ──────────────────────────────────────── */
+
+  /* Masqué sur mobile par défaut */
+  .mobile-only {
+    display: none;
+  }
+
+  /* ── Mobile Sidebar Overlay ── */
+  .mobile-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease;
+  }
+
+  .mobile-sidebar-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(280px, 85vw);
+    animation: slideInFromLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── Bottom Navigation Bar ── */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: rgba(16, 16, 28, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--color-border-subtle);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-nav-inner {
+    display: flex;
+    align-items: stretch;
+    height: 60px;
+  }
+
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    color: var(--color-text-muted);
+    font-size: 0.58rem;
+    font-family: inherit;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    padding: 0.4rem;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    text-transform: uppercase;
+  }
+
+  .mobile-nav-btn.active {
+    color: var(--color-accent-violet-light);
+  }
+
+  .mobile-nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg, var(--color-accent-violet), var(--color-accent-cyan));
+  }
+}
+
+/* ─── MEDIA QUERIES MOBILE (< 768px) ─── */
+@media (max-width: 767px) {
+
+  /* Bottom nav visible sur mobile */
+  .mobile-nav {
+    display: block;
+  }
+
+  /* Utilitaires de visibilité */
+  .mobile-only {
+    display: flex !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Modales : full-width sur petits écrans */
+  .modal-card {
+    max-width: 100%;
+    border-radius: 1rem;
+    padding: 1.25rem;
+  }
+
+  /* Cibles tactiles minimum 44px */
+  .btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* Inputs : 16px pour bloquer le zoom automatique iOS */
+  .input {
+    font-size: 1rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  /* 404 page : taille réduite */
+  .not-found-404 {
+    font-size: 5rem !important;
   }
 }
