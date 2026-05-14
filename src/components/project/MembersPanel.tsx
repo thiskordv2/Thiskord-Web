@@ -60,16 +60,28 @@ export function MembersPanel({ project }: { project: Project }) {
             />
           </div>
         )}
-        {members.map((member: { user_id: number; user_name: string }) => (
+        {members.map((member: { user_id: number; user_name: string; user_picture?: string }) => (
           <div
             key={member.user_id}
             className="flex items-center gap-3 py-2 px-2 rounded-lg transition-colors duration-150"
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-hover)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
           >
+            {member.user_picture ? (
+              <img
+                src={member.user_picture}
+                alt={member.user_name}
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                style={{ border: '1px solid var(--color-border-subtle)' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.setProperty('display', 'flex') }}
+              />
+            ) : null}
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
-              style={{ background: getAvatarGradient(member.user_name) }}
+              className="w-8 h-8 rounded-full items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+              style={{
+                background: getAvatarGradient(member.user_name),
+                display: member.user_picture ? 'none' : 'flex',
+              }}
             >
               {member.user_name[0]?.toUpperCase()}
             </div>

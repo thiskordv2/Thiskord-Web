@@ -74,10 +74,20 @@ export function Sidebar({ isMobileOverlay = false }: SidebarProps) {
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface-hover)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
           >
+            {user?.user_picture ? (
+              <img
+                src={user.user_picture}
+                alt={user.user_name}
+                className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                style={{ border: '2px solid var(--color-border-subtle)' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.setProperty('display', 'flex') }}
+              />
+            ) : null}
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
+              className="w-9 h-9 rounded-full items-center justify-center text-white text-sm font-semibold flex-shrink-0"
               style={{
                 background: 'linear-gradient(135deg, var(--color-accent-violet), var(--color-accent-cyan))',
+                display: user?.user_picture ? 'none' : 'flex',
               }}
             >
               {user?.user_name?.[0]?.toUpperCase() ?? '?'}

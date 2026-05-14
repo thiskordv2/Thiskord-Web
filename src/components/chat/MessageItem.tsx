@@ -162,11 +162,21 @@ export function MessageItem({ message, isGrouped, onDelete, onEdit, currentUser 
       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(34, 34, 60, 0.3)' }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
     >
+      {message.user_picture ? (
+        <img
+          src={message.user_picture}
+          alt={message.user}
+          className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5"
+          style={{ border: '1px solid var(--color-border-subtle)' }}
+          onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.setProperty('display', 'flex') }}
+        />
+      ) : null}
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5"
+        className="w-8 h-8 rounded-full items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5"
         style={{
           background: 'linear-gradient(135deg, var(--color-accent-violet-dark), var(--color-accent-violet))',
           color: 'rgba(255, 255, 255, 0.9)',
+          display: message.user_picture ? 'none' : 'flex',
         }}
       >
         {initials}

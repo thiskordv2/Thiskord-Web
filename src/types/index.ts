@@ -59,6 +59,7 @@ export interface CreateChannelRequest {
 export interface ChatMessage {
   id: number
   user: string
+  user_picture?: string // URL photo de profil (optionnel, repli sur initiale)
   text: string
   dateTime: string // format dd/MM HH:mm (déjà converti Europe/Paris côté serveur)
 }

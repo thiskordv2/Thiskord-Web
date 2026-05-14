@@ -75,12 +75,22 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
+            {user.user_picture ? (
+              <img
+                src={user.user_picture}
+                alt={user.user_name}
+                className="w-14 h-14 rounded-2xl object-cover flex-shrink-0"
+                style={{ boxShadow: '0 4px 20px rgba(139, 92, 246, 0.25)', border: '2px solid var(--color-border-subtle)' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.setProperty('display', 'flex') }}
+              />
+            ) : null}
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold"
+              className="w-14 h-14 rounded-2xl items-center justify-center text-2xl font-bold"
               style={{
                 background: 'linear-gradient(135deg, var(--color-accent-violet), var(--color-accent-cyan))',
                 color: 'white',
                 boxShadow: '0 4px 20px rgba(139, 92, 246, 0.25)',
+                display: user.user_picture ? 'none' : 'flex',
               }}
             >
               {user.user_name?.[0]?.toUpperCase()}
